@@ -196,7 +196,6 @@ and open the template in the editor.
 				    return false;
 				});
 				$(document).on("click", ".target-summon", function () {
-				    var units_hp = get_target_units_hp() * 1;
 				    var base_hp = $("#now-hp").html() * 1 - $("#min-hp").html() * 1;
 				    var ps = $(this).data("ps");
 				    var dm_ps = ps.toString().split(',');
@@ -214,71 +213,13 @@ and open the template in the editor.
 				    var rem = $("#now-hp").html();
 				    var old_min_hp = $("#min-hp").html() * 1;
 				    var min_hp = summon_dm_total + old_min_hp;
-				    console.log("ベースHP：" + base_hp);
-				    console.log("召喚トータルダメージ：" + summon_dm_total);
-				    console.log("部隊撃破ダメージ：" + units_hp);
 
 				    $(".dm").html("");
-				    set_summon_dm(rem, min_hp);
+				    set_target_summon_dm(rem, min_hp);
 				    $("#min-hp").html(min_hp);
 				    $.toaster({ priority: 'success', title: 'Notice', message: '被ダメージ算出しました。' });
 				    return false;
 				});
-
-
-				function get_target_units_hp() {
-					var units_hp = 0;
-					if ($("#dm5-1").html() == "〇") {
-						units_hp = Number($("#5-1 .char-hp").val());
-						if ($("#dm5-2").html() == "〇") {
-							units_hp += Number($("#5-2 .char-hp").val());
-						}
-						if ($("#dm5-3").html() == "〇") {
-							units_hp += Number($("#5-3 .char-hp").val());
-						}
-						return units_hp;
-					}
-					if ($("#dm4-1").html() == "〇") {
-						units_hp = Number($("#4-1 .char-hp").val());
-						if ($("#dm4-2").html() == "〇") {
-							units_hp += Number($("#4-2 .char-hp").val());
-						}
-						if ($("#dm4-3").html() == "〇") {
-							units_hp += Number($("#4-3 .char-hp").val());
-						}
-						return units_hp;
-					}
-					if ($("#dm3-1").html() == "〇") {
-						units_hp = Number($("#3-1 .char-hp").val());
-						if ($("#dm3-2").html() == "〇") {
-							units_hp += Number($("#3-2 .char-hp").val());
-						}
-						if ($("#dm3-3").html() == "〇") {
-							units_hp += Number($("#3-3 .char-hp").val());
-						}
-						return units_hp;
-					}
-					if ($("#dm2-1").html() == "〇") {
-						units_hp = Number($("#2-1 .char-hp").val());
-						if ($("#dm2-2").html() == "〇") {
-							units_hp += Number($("#2-2 .char-hp").val());
-						}
-						if ($("#dm2-3").html() == "〇") {
-							units_hp += Number($("#2-3 .char-hp").val());
-						}
-						return units_hp;
-					}
-					if ($("#dm1-1").html() == "〇") {
-						units_hp = Number($("#1-1 .char-hp").val());
-						if ($("#dm1-2").html() == "〇") {
-							units_hp += Number($("#1-2 .char-hp").val());
-						}
-						if ($("#dm1-3").html() == "〇") {
-							units_hp += Number($("#1-3 .char-hp").val());
-						}
-						return units_hp;
-					}
-				}
 				function get_total_hp() {
 					var total = 0;
 					$(".char-hp").each(function (index, element) {
@@ -306,21 +247,142 @@ and open the template in the editor.
 				function set_summon_dm(stop, min) {
 				    var total = 0;
 				    $(".char-hp").each(function (index, element) {
+				        if ($(element).val() != 0) {
+				            if (stop >= total) {
+				                $("#dm" + $(element).parent(".char-grid").attr("id")).html("〇");
+				            } else{
+				                $("#dm" + $(element).parent(".char-grid").attr("id")).html("×");
+				            }
+				        }
+				        total += Number($(element).val());
+				    });
+				    set_triangle_reverse();
+				}
+
+				function set_target_summon_dm(stop, min) {
+				    var total = 0;
+				    $(".char-hp").each(function (index, element) {
 				        total += Number($(element).val());
 				        if ($(element).val() != 0) {
 				            if (total > min) {
 				                $("#dm" + $(element).parent(".char-grid").attr("id")).html("〇");
 				            } else {
-				                $("#dm" + $(element).parent(".char-grid").attr("id")).html("");
+				                $("#dm" + $(element).parent(".char-grid").attr("id")).html("×");
 				            }
 				        }
-				        //						console.log("id:" + $(element).parent(".char-grid").attr("id") + ", hp:" + $(element).val());
-				        //						console.log("total:" + total);
-				        //						console.log("------------------");
-				        if (total >= stop) {
-				            return false;
-				        }
 				    });
+				    set_triangle();
+				}
+
+				function set_triangle() 
+                {
+				    if ($("#dm1-3").html() == "〇") {
+				        if ($("#dm1-2").html() == "×") {
+				            $("#dm1-2").html("△");
+				            $("#dm1-1").html("△");
+				        }
+				    } else if ($("#dm1-2").html() == "〇") {
+				        if ($("#dm1-1").html() == "×") {
+				            $("#dm1-1").html("△");
+				        }
+				    }
+				    if ($("#dm2-3").html() == "〇") {
+				        if ($("#dm2-2").html() == "×") {
+				            $("#dm2-2").html("△");
+				            $("#dm2-1").html("△");
+				        }
+				    } else if ($("#dm2-2").html() == "〇") {
+				        if ($("#dm2-1").html() == "×") {
+				            $("#dm2-1").html("△");
+				        }
+				    }
+				    if ($("#dm1-3").html() == "〇") {
+				        if ($("#dm3-2").html() == "×") {
+				            $("#dm3-2").html("△");
+				            $("#dm3-1").html("△");
+				        }
+				    } else if ($("#dm3-2").html() == "〇") {
+				        if ($("#dm3-1").html() == "×") {
+				            $("#dm3-1").html("△");
+				        }
+				    }
+				    if ($("#dm4-3").html() == "〇") {
+				        if ($("#dm4-2").html() == "×") {
+				            $("#dm4-2").html("△");
+				            $("#dm4-1").html("△");
+				        }
+				    } else if ($("#dm4-2").html() == "〇") {
+				        if ($("#dm4-1").html() == "×") {
+				            $("#dm4-1").html("△");
+				        }
+				    }
+				    if ($("#dm5-3").html() == "〇") {
+				        if ($("#dm5-2").html() == "×") {
+				            $("#dm5-2").html("△");
+				            $("#dm5-1").html("△");
+				        }
+				    } else if ($("#dm5-2").html() == "〇") {
+				        if ($("#dm5-1").html() == "×") {
+				            $("#dm5-1").html("△");
+				        }
+				    }
+				}
+
+				function set_triangle_reverse() {
+				    if ($("#dm1-1").html() == "〇") {
+				        if ($("#dm1-2").html() == "×") {
+				            $("#dm1-2").html("△");
+				        }
+				    }
+				    if ($("#dm1-2").html() == "〇" && $("#dm1-2").html() == "△") {
+				        if ($("#dm1-3").html() == "×") {
+				            $("#dm1-3").html("△");
+				        }
+				    }
+
+				    if ($("#dm2-1").html() == "〇") {
+				        if ($("#dm2-2").html() == "×") {
+				            $("#dm2-2").html("△");
+				        }
+				    }
+				    if ($("#dm2-2").html() == "〇" && $("#dm2-2").html() == "△") {
+				        if ($("#dm2-3").html() == "×") {
+				            $("#dm2-3").html("△");
+				        }
+				    }
+
+				    if ($("#dm3-1").html() == "〇") {
+				        if ($("#dm3-2").html() == "×") {
+				            $("#dm3-2").html("△");
+				        }
+				    }
+				    if ($("#dm3-2").html() == "〇" && $("#dm3-2").html() == "△") {
+				        if ($("#dm3-3").html() == "×") {
+				            $("#dm3-3").html("△");
+				        }
+				    }
+
+				    if ($("#dm4-1").html() == "〇") {
+				        if ($("#dm4-2").html() == "×") {
+				            $("#dm4-2").html("△");
+				        }
+				    }
+				    if ($("#dm4-2").html() == "〇" && $("#dm4-2").html() == "△") {
+				        if ($("#dm4-3").html() == "×") {
+				            $("#dm4-3").html("△");
+				        }
+				    }
+
+				    if ($("#dm5-1").html() == "〇") {
+				        if ($("#dm5-2").html() == "×") {
+				            $("#dm5-2").html("△");
+				        }
+				    }
+				    if ($("#dm5-2").html() == "〇" && $("#dm5-2").html() == "△") {
+				        if ($("#dm5-3").html() == "×") {
+				            $("#dm5-3").html("△");
+				        }
+				    }
 				}
 
 				$(document).on("click", "#1-save", function () {
@@ -638,7 +700,7 @@ and open the template in the editor.
 
 
 				<h2><p style="text-align: center;">防衛デッキHP調整@刻のイシュタリア</p></h2><br>
-		<h4><p style="text-align: center;">更新履歴　2016/12/13　被タゲ時の残ユニットの表示バグを修正しました。</p></h4>
+		<h4><p style="text-align: center;">更新履歴　2016/12/29　召喚時の表記を変更しました。</p></h4>
 		
 		<div class="container">
 			<div class="row">
@@ -799,6 +861,7 @@ and open the template in the editor.
 		<section class="container default-hide-content" id="deck_damage">
 			<div class="row">
 				<div class="col-md-6" style="padding: 0 5px;">
+       				<a class="btn btn-primary btn-block" id="exec" href="#" role="button">デッキデータ再算出</a>
 					<h3 class="opener sub" data-target="#summon_list"><i class="fa fa-angle-right" aria-hidden="true"></i>被ダメージ</h3>
 					<div id="summon_list">
 						<a class="btn btn-default btn-block summon" href="#" role="button" data-ps="0.7">バハムート</a>
@@ -818,7 +881,7 @@ and open the template in the editor.
 						<a class="btn btn-default btn-block target-summon" href="#" role="button" data-ps="0.3,0.3">タゲ→ロレロレ</a>
 						<a class="btn btn-default btn-block target-summon" href="#" role="button" data-ps="0.3,0.3,0.3">タゲ→ロレロレロレ</a>
 						<a class="btn btn-default btn-block target-summon" href="#" role="button" data-ps="0.3,0.3,0.3,0.3">タゲ→ロレロレロレロレ</a>
-						<p style="margin-top: 10px;">※砲撃はローレライと同ダメのためロレで確認してください。<br>※タゲ→XXはタゲ取った状態で与召喚ダメ→与部隊撃破ダメ後の状態を表示します。<br>※砲撃タゲ砲撃等のケースを確認したい場合は、ロレダメ与えてからタゲ→ロレで確認してください。<br>※通常召喚を押したらタゲ状態が自動的に解除されます。</p>
+						<p style="margin-top: 10px;">※砲撃はローレライと同ダメのためロレで確認してください。<br>※タゲ→XXはタゲ取った状態で与召喚ダメ→与部隊撃破ダメ後の状態を表示します。<br>※通常召喚を押したらタゲ状態が自動的に解除されます。</p>
 					</div>
 				</div>
 				<div class="col-md-6" style="padding: 0 5px;">
@@ -831,6 +894,7 @@ and open the template in the editor.
 						<tr><th>4部隊</th><td><span id="dm4-1" class="dm"></span></td><td><span id="dm4-2" class="dm"></span></td><td><span id="dm4-3" class="dm"></span></td></tr>
 						<tr><th>5部隊</th><td><span id="dm5-1" class="dm"></span></td><td><span id="dm5-2" class="dm"></span></td><td><span id="dm5-3" class="dm"></span></td></tr>
 					</table>
+                    <p style="margin-top: 10px;">○→生存部隊<br>×→お亡くなりになった部隊<br>△→HP無いけど出てくる部隊<br>空白→セットしてない</p>
 				</div>
 			</div>
 		</section>
@@ -847,7 +911,7 @@ and open the template in the editor.
 					<table class="table table-bordered table-hover">
 						<tr><th></th><th>ダメ</th><th>朝平原</th><th>平原</th><th>夜平原</th><th>機甲</th><th>砂漠</th><th>海上</th></tr>
 						<tr><th>バハムート</th><td>70%</td><td>100</td><td>100</td><td>100</td><td>100</td><td>100</td><td>--</td></tr>
-						<tr><th>リヴァイアサン</th><td>70%</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>80</td></tr>
+						<tr><th>リヴァイアサン</th><td>70%</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>100</td></tr>
 						<tr><th>オルランド</th><td>50%</td><td>--</td><td>50</td><td>50</td><td>50</td><td>50</td><td>50</td></tr>
 						<tr><th>ローレライ</th><td>30%</td><td>30</td><td>25</td><td>--</td><td>--</td><td>--</td><td>30</td></tr>
 						<tr><th>タイタン</th><td>20%</td><td>15</td><td>--</td><td>--</td><td>20</td><td>--</td><td>--</td></tr>
@@ -862,8 +926,8 @@ and open the template in the editor.
 						<tr><th></th><th>朝平原</th><th>平原</th><th>夜平原</th><th>機甲</th><th>砂漠</th><th>海上</th></tr>
 						<tr><th>バハムート</th><td>50pt(250pt)</td><td>30pt(150pt)</td><td>21pt(107pt)</td><td>21pt(107pt)</td><td>50pt(250pt)</td><td>--</td></tr>
 						<tr><th>リヴァイアサン</th><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>さあね</td></tr>
-						<tr><th>オルランド</th><td>--</td><td>24pt(120pt)</td><td>17pt(86pt)</td><td>17pt(86pt)</td><td>40pt(200pt)</td><td>さあね</td></tr>
-						<tr><th>ローレライ</th><td>22pt(111pt)</td><td>16pt(80pt)</td><td>--</td><td>--</td><td>--</td><td>さあね</td></tr>
+						<tr><th>オルランド</th><td>--</td><td>24pt(120pt)</td><td>17pt(86pt)</td><td>17pt(86pt)</td><td>40pt(200pt)</td><td>24pt(120pt)</td></tr>
+						<tr><th>ローレライ</th><td>22pt(111pt)</td><td>16pt(80pt)</td><td>--</td><td>--</td><td>--</td><td>16pt(80pt)</td></tr>
 						<tr><th>タイタン</th><td>44pt(222pt)</td><td>--</td><td>--</td><td>14pt(71pt)</td><td>--</td><td>--</td></tr>
 						<tr><th>ワルプルギス</th><td>--</td><td>--</td><td>19pt(95pt)</td><td>--</td><td>--</td><td>--</td></tr>
 						<tr><th>ウルスラグナ</th><td>--</td><td>--</td><td>--</td><td>--</td><td>22pt(111pt)</td><td>--</td></tr>
@@ -952,7 +1016,7 @@ and open the template in the editor.
 				<div class="col-md-12" style="margin-top: 30px;">
 					
 当ツールは、諸事情により前作成者がメンテナンスできなくなった為、GNU Free Documentation Licenseに基づく改変・再利用の許可より<a href="https://twitter.com/hiyoRIOT" target="_blank">とーすと</a>が勝手に引き継いだものです。
-サポートやご意見は前管理人様ではなくとーすとまでお願い致します。また、ソースコードは<a href="https://github.com/hiyoRIOT/ish" target="_blank">こちら</a>よりご参照下さいませ。
+サポートやご意見は前管理人様ではなくとーすとまでお願い致します。また、ソースコードは<a href="https://github.com/hiyoRIOT/ish" target="_blank">こちら</a>よりご参照下さい。
 				</div>
 			</div>
 		</section>
