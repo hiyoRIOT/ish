@@ -1,0 +1,962 @@
+﻿<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+	<head>
+		<title>防衛デッキHP調整@刻のイシュタリア</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+		<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+		<script src="jquery.cookie.js"></script>
+		<script src="jquery.toaster.js"></script>
+		<style>
+			/* default */
+			* {
+				font-family: "Hiragino Kaku Gothic ProN","メイリオ", sans-serif;
+			}
+			html {
+				font-size: 14px;
+			}
+			body {
+				margin: 0 10px 20px 10px;
+			}
+			h2 {
+				font-size: 1.6rem;
+			}
+			h3 {
+				font-size: 1.2rem;
+			}
+			h4 {				
+				font-size: 1.0rem;
+			}
+			h3 .fa {
+				font-size: 1.2rem;
+				margin-right: 10px;
+			}
+			.opener {
+				cursor: pointer;
+				background-color: #2196F3;
+				color: #fff;
+				padding: 10px 10px 10px 10px;
+			}
+			.opener.sub {
+				background-color: #00BCD4;
+			}
+			input[type="number"] {
+				width: 100%;
+				padding: 5px 10px;
+			}
+			input[type="text"] {
+				width: 100%;
+				padding: 5px 10px;
+			}
+
+			/* view */
+			.unit-data-list {
+				font-size: 0.8rem;
+			}
+			.char-grid {
+				position: relative;
+				border: 1px solid #999999;
+				background-color: #fafafa;
+				padding: 10px;
+			}
+			.char-grid .fa {
+				position: absolute;
+				top: 5px;
+				font-size: 1.5em;
+				cursor: pointer;
+			}
+			.char-grid .cp {
+				right: 100px;
+			}
+			.char-grid .pst {
+				right: 40px;
+			}
+			.char-grid .cut {
+				right: 70px;
+			}
+			.char-grid .rm {
+				right: 10px;
+			}
+			.char-grid:hover {
+				background-color: #dddddd;
+			}
+			.tr-cf * {
+				color: #d50000;
+			}
+			.tr-cw * {
+				color: #2196f3;
+			}
+			.tr-ce * {
+				color: #009688;
+			}
+			.tr-cn * {
+				color: #9c27b0;
+			}
+			.skill-checker-main {
+				line-height: 3.0em;
+			}
+			.skill-checker select {
+				padding: 5px 10px;
+				margin: 0 5px;
+			}
+
+			.default-hide-content {
+				display: none;
+			}
+
+			.goog-te-combo {
+				padding: 5px 10px;
+			}
+		</style>
+		<script>
+			jQuery(function ($) {
+				$(document).on("click", "#exec", function () {
+					var total_hp = get_total_hp();
+					if (total_hp === 0) {
+						$.toaster({priority: 'warning', title: 'Notice', message: 'HP入力してね。'});
+						return false;
+					}
+					$("#give-point").html(Math.floor(3000 + total_hp / 100));
+					$("#total-hp").html(total_hp);
+					$("#min-hp").html(0);
+					$("#now-hp").html(total_hp);
+					get_unit_ps(1, 1, total_hp);
+					get_unit_ps(1, 2, total_hp);
+					get_unit_ps(1, 3, total_hp);
+					get_unit_ps(2, 1, total_hp);
+					get_unit_ps(2, 2, total_hp);
+					get_unit_ps(2, 3, total_hp);
+					get_unit_ps(3, 1, total_hp);
+					get_unit_ps(3, 2, total_hp);
+					get_unit_ps(3, 3, total_hp);
+					get_unit_ps(4, 1, total_hp);
+					get_unit_ps(4, 2, total_hp);
+					get_unit_ps(4, 3, total_hp);
+					get_unit_ps(5, 1, total_hp);
+					get_unit_ps(5, 2, total_hp);
+					get_unit_ps(5, 3, total_hp);
+					var ps1 = Number($("#ps1-1").attr("data-ps")) + Number($("#ps1-2").attr("data-ps")) + Number($("#ps1-3").attr("data-ps"));
+					ps1 = Math.floor(ps1 * 100) / 100;
+					var ps2 = Number($("#ps2-1").attr("data-ps")) + Number($("#ps2-2").attr("data-ps")) + Number($("#ps2-3").attr("data-ps"));
+					ps2 = Math.floor(ps2 * 100) / 100;
+					var ps3 = Number($("#ps3-1").attr("data-ps")) + Number($("#ps3-2").attr("data-ps")) + Number($("#ps3-3").attr("data-ps"));
+					ps3 = Math.floor(ps3 * 100) / 100;
+					var ps4 = Number($("#ps4-1").attr("data-ps")) + Number($("#ps4-2").attr("data-ps")) + Number($("#ps4-3").attr("data-ps"));
+					ps4 = Math.floor(ps4 * 100) / 100;
+					var ps5 = Number($("#ps5-1").attr("data-ps")) + Number($("#ps5-2").attr("data-ps")) + Number($("#ps5-3").attr("data-ps"));
+					ps5 = Math.floor(ps5 * 100) / 100;
+					$("#ps1").html(ps1);
+					$("#ps2").html(ps2);
+					$("#ps3").html(ps3);
+					$("#ps4").html(ps4);
+					$("#ps5").html(ps5);
+					$.toaster({priority: 'success', title: 'Notice', message: '算出完了しました。'});
+					return false;
+				});
+				$(document).on("click", "#grid-reset", function () {
+					data_reset(1, 1);
+					data_reset(1, 2);
+					data_reset(1, 3);
+					data_reset(2, 1);
+					data_reset(2, 2);
+					data_reset(2, 3);
+					data_reset(3, 1);
+					data_reset(3, 2);
+					data_reset(3, 3);
+					data_reset(4, 1);
+					data_reset(4, 2);
+					data_reset(4, 3);
+					data_reset(5, 1);
+					data_reset(5, 2);
+					data_reset(5, 3);
+					$("#total-hp").html("0");
+					$("#now-hp").html("0");
+					$("#min-hp").html("0");
+					$("#deck-memo").val("");
+					$.toaster({priority: 'danger', title: 'Notice', message: 'リセットしました。'});
+					return false;
+				});
+				$(document).on("click", ".summon", function () {
+				    var hp = $("#now-hp").html() - $("#min-hp").html();
+				    $("#min-hp").html(0);
+				    var dm = Math.floor(hp * Number($(this).data("ps")));
+				    var rem = hp - dm;
+				    $(".dm").html("");
+				    set_summon_dm(rem, 0);
+				    $("#now-hp").html(rem);
+				    $.toaster({ priority: 'success', title: 'Notice', message: '被ダメージ算出しました。' });
+				    return false;
+				});
+				$(document).on("click", ".target-summon", function () {
+				    var units_hp = get_target_units_hp() * 1;
+				    var base_hp = $("#now-hp").html() * 1 - $("#min-hp").html() * 1;
+				    var ps = $(this).data("ps");
+				    var dm_ps = ps.toString().split(',');
+				    var summon_dm_total = 0 * 1;
+				    var hp = base_hp;
+				    console.log("召喚ダメージレート(Array)：" + dm_ps);
+				    $.each(dm_ps, function (index, val) {
+				        var summon_dm = Math.floor(hp * Number(val));
+				        console.log("現HP：" + hp);
+				        console.log(index + 1 + "回目の召喚ダメージ：" + summon_dm);
+				        summon_dm_total += Number(summon_dm);
+				        console.log("召喚トータルダメージ：" + summon_dm_total);
+				        hp = hp - summon_dm;
+				    });
+				    var rem = $("#now-hp").html();
+				    var old_min_hp = $("#min-hp").html() * 1;
+				    var min_hp = summon_dm_total + old_min_hp;
+				    console.log("ベースHP：" + base_hp);
+				    console.log("召喚トータルダメージ：" + summon_dm_total);
+				    console.log("部隊撃破ダメージ：" + units_hp);
+
+				    $(".dm").html("");
+				    set_summon_dm(rem, min_hp);
+				    $("#min-hp").html(min_hp);
+				    $.toaster({ priority: 'success', title: 'Notice', message: '被ダメージ算出しました。' });
+				    return false;
+				});
+
+
+				function get_target_units_hp() {
+					var units_hp = 0;
+					if ($("#dm5-1").html() == "〇") {
+						units_hp = Number($("#5-1 .char-hp").val());
+						if ($("#dm5-2").html() == "〇") {
+							units_hp += Number($("#5-2 .char-hp").val());
+						}
+						if ($("#dm5-3").html() == "〇") {
+							units_hp += Number($("#5-3 .char-hp").val());
+						}
+						return units_hp;
+					}
+					if ($("#dm4-1").html() == "〇") {
+						units_hp = Number($("#4-1 .char-hp").val());
+						if ($("#dm4-2").html() == "〇") {
+							units_hp += Number($("#4-2 .char-hp").val());
+						}
+						if ($("#dm4-3").html() == "〇") {
+							units_hp += Number($("#4-3 .char-hp").val());
+						}
+						return units_hp;
+					}
+					if ($("#dm3-1").html() == "〇") {
+						units_hp = Number($("#3-1 .char-hp").val());
+						if ($("#dm3-2").html() == "〇") {
+							units_hp += Number($("#3-2 .char-hp").val());
+						}
+						if ($("#dm3-3").html() == "〇") {
+							units_hp += Number($("#3-3 .char-hp").val());
+						}
+						return units_hp;
+					}
+					if ($("#dm2-1").html() == "〇") {
+						units_hp = Number($("#2-1 .char-hp").val());
+						if ($("#dm2-2").html() == "〇") {
+							units_hp += Number($("#2-2 .char-hp").val());
+						}
+						if ($("#dm2-3").html() == "〇") {
+							units_hp += Number($("#2-3 .char-hp").val());
+						}
+						return units_hp;
+					}
+					if ($("#dm1-1").html() == "〇") {
+						units_hp = Number($("#1-1 .char-hp").val());
+						if ($("#dm1-2").html() == "〇") {
+							units_hp += Number($("#1-2 .char-hp").val());
+						}
+						if ($("#dm1-3").html() == "〇") {
+							units_hp += Number($("#1-3 .char-hp").val());
+						}
+						return units_hp;
+					}
+				}
+				function get_total_hp() {
+					var total = 0;
+					$(".char-hp").each(function (index, element) {
+						total += Number($(element).val());
+					});
+					return total;
+				}
+				function get_unit_ps(t, u, total) {
+					hp = $("#" + t + "-" + u).children("input").val();
+					ps = hp / total * 100 * 100;
+					ps = Math.round(ps) / 100;
+					$("#ps" + t + "-" + u).html(ps);
+					$("#ps" + t + "-" + u).attr("data-ps", ps);
+					if (ps != 0) {
+						$("#dm" + t + "-" + u).html("〇");
+					}
+				}
+				function data_reset(t, u) {
+					$(".char-hp").val("0");
+					$(".char-memo").val("");
+					$("#ps" + t + "-" + u).html("0");
+					$("#dm" + t + "-" + u).html("");
+					return;
+				}
+				function set_summon_dm(stop, min) {
+				    var total = 0;
+				    $(".char-hp").each(function (index, element) {
+				        total += Number($(element).val());
+				        if ($(element).val() != 0) {
+				            if (total > min) {
+				                $("#dm" + $(element).parent(".char-grid").attr("id")).html("〇");
+				            } else {
+				                $("#dm" + $(element).parent(".char-grid").attr("id")).html("");
+				            }
+				        }
+				        //						console.log("id:" + $(element).parent(".char-grid").attr("id") + ", hp:" + $(element).val());
+				        //						console.log("total:" + total);
+				        //						console.log("------------------");
+				        if (total >= stop) {
+				            return false;
+				        }
+				    });
+				}
+
+				$(document).on("click", "#1-save", function () {
+					data_save("deck_aj_h");
+					return false;
+				});
+				$(document).on("click", "#1-load", function () {
+					$("#grid-reset").trigger("click");
+					data_load("deck_aj_h");
+					return false;
+				});
+				$(document).on("click", "#2-save", function () {
+					data_save("deck_aj_ah");
+					return false;
+				});
+				$(document).on("click", "#2-load", function () {
+					$("#grid-reset").trigger("click");
+					data_load("deck_aj_ah");
+					return false;
+				});
+				$(document).on("click", "#3-save", function () {
+					data_save("deck_aj_yh");
+					return false;
+				});
+				$(document).on("click", "#3-load", function () {
+					$("#grid-reset").trigger("click");
+					data_load("deck_aj_yh");
+					return false;
+				});
+				$(document).on("click", "#4-save", function () {
+					data_save("deck_aj_k");
+					return false;
+				});
+				$(document).on("click", "#4-load", function () {
+					$("#grid-reset").trigger("click");
+					data_load("deck_aj_k");
+					return false;
+				});
+				$(document).on("click", "#5-save", function () {
+					data_save("deck_aj_s");
+					return false;
+				});
+				$(document).on("click", "#5-load", function () {
+					$("#grid-reset").trigger("click");
+					data_load("deck_aj_s");
+					return false;
+				});
+				$(document).on("click", "#6-save", function () {
+					data_save("deck_aj_6");
+					return false;
+				});
+				$(document).on("click", "#6-load", function () {
+					$("#grid-reset").trigger("click");
+					data_load("deck_aj_6");
+					return false;
+				});
+				$(document).on("click", "#7-save", function () {
+					data_save("deck_aj_7");
+					return false;
+				});
+				$(document).on("click", "#7-load", function () {
+					$("#grid-reset").trigger("click");
+					data_load("deck_aj_7");
+					return false;
+				});
+				$(document).on("click", "#8-save", function () {
+					data_save("deck_aj_8");
+					return false;
+				});
+				$(document).on("click", "#8-load", function () {
+					$("#grid-reset").trigger("click");
+					data_load("deck_aj_8");
+					return false;
+				});
+				$(document).on("click", "#9-save", function () {
+					data_save("deck_aj_9");
+					return false;
+				});
+				$(document).on("click", "#9-load", function () {
+					$("#grid-reset").trigger("click");
+					data_load("deck_aj_9");
+					return false;
+				});
+				$(document).on("click", "#10-save", function () {
+					data_save("deck_aj_10");
+					return false;
+				});
+				$(document).on("click", "#10-load", function () {
+					$("#grid-reset").trigger("click");
+					data_load("deck_aj_10");
+					return false;
+				});
+
+				function data_save(data_key) {
+					var expires = 365;
+					var val = $("#1-1").children(".char-hp").val() + ',' + $("#1-2").children(".char-hp").val() + ',' + $("#1-3").children(".char-hp").val() + ',';
+					val += $("#2-1").children(".char-hp").val() + ',' + $("#2-2").children(".char-hp").val() + ',' + $("#2-3").children(".char-hp").val() + ',';
+					val += $("#3-1").children(".char-hp").val() + ',' + $("#3-2").children(".char-hp").val() + ',' + $("#3-3").children(".char-hp").val() + ',';
+					val += $("#4-1").children(".char-hp").val() + ',' + $("#4-2").children(".char-hp").val() + ',' + $("#4-3").children(".char-hp").val() + ',';
+					val += $("#5-1").children(".char-hp").val() + ',' + $("#5-2").children(".char-hp").val() + ',' + $("#5-3").children(".char-hp").val();
+					var memo = $("#1-1").children(".char-memo").val() + ',' + $("#1-2").children(".char-memo").val() + ',' + $("#1-3").children(".char-memo").val() + ',';
+					memo += $("#2-1").children(".char-memo").val() + ',' + $("#2-2").children(".char-memo").val() + ',' + $("#2-3").children(".char-memo").val() + ',';
+					memo += $("#3-1").children(".char-memo").val() + ',' + $("#3-2").children(".char-memo").val() + ',' + $("#3-3").children(".char-memo").val() + ',';
+					memo += $("#4-1").children(".char-memo").val() + ',' + $("#4-2").children(".char-memo").val() + ',' + $("#4-3").children(".char-memo").val() + ',';
+					memo += $("#5-1").children(".char-memo").val() + ',' + $("#5-2").children(".char-memo").val() + ',' + $("#5-3").children(".char-memo").val();
+					memo += ',' + $("#deck-memo").val();
+					$.cookie(data_key, val, {expires: expires});
+					$.cookie(data_key + "_m", memo, {expires: expires});
+					$.toaster({priority: 'info', title: 'Notice', message: 'セーブしました。'});
+
+				}
+
+				function data_load(data_key) {
+					var val = $.cookie(data_key);
+					if (typeof val === "undefined") {
+						$.toaster({priority: 'info', title: 'Notice', message: 'デッキ情報がありません。'});
+						return false;
+					}
+					var term = val.split(',');
+					$("#1-1").children(".char-hp").val(Number(term[0]));
+					$("#1-2").children(".char-hp").val(Number(term[1]));
+					$("#1-3").children(".char-hp").val(Number(term[2]));
+					$("#2-1").children(".char-hp").val(Number(term[3]));
+					$("#2-2").children(".char-hp").val(Number(term[4]));
+					$("#2-3").children(".char-hp").val(Number(term[5]));
+					$("#3-1").children(".char-hp").val(Number(term[6]));
+					$("#3-2").children(".char-hp").val(Number(term[7]));
+					$("#3-3").children(".char-hp").val(Number(term[8]));
+					$("#4-1").children(".char-hp").val(Number(term[9]));
+					$("#4-2").children(".char-hp").val(Number(term[10]));
+					$("#4-3").children(".char-hp").val(Number(term[11]));
+					$("#5-1").children(".char-hp").val(Number(term[12]));
+					$("#5-2").children(".char-hp").val(Number(term[13]));
+					$("#5-3").children(".char-hp").val(Number(term[14]));
+					var val = $.cookie(data_key + "_m");
+					if (typeof val === "undefined") {
+						$.toaster({priority: 'info', title: 'Notice', message: 'デッキ情報がありません。'});
+						return false;
+					}
+					var term = val.split(',');
+					$("#1-1").children(".char-memo").val(term[0]);
+					$("#1-2").children(".char-memo").val(term[1]);
+					$("#1-3").children(".char-memo").val(term[2]);
+					$("#2-1").children(".char-memo").val(term[3]);
+					$("#2-2").children(".char-memo").val(term[4]);
+					$("#2-3").children(".char-memo").val(term[5]);
+					$("#3-1").children(".char-memo").val(term[6]);
+					$("#3-2").children(".char-memo").val(term[7]);
+					$("#3-3").children(".char-memo").val(term[8]);
+					$("#4-1").children(".char-memo").val(term[9]);
+					$("#4-2").children(".char-memo").val(term[10]);
+					$("#4-3").children(".char-memo").val(term[11]);
+					$("#5-1").children(".char-memo").val(term[12]);
+					$("#5-2").children(".char-memo").val(term[13]);
+					$("#5-3").children(".char-memo").val(term[14]);
+					$("#deck-memo").val(term[15]);
+					$.toaster({priority: 'info', title: 'Notice', message: 'ロードしました。'});
+				}
+
+				var g_hp = 0;
+				var g_memo = "";
+				$(document).on("click", ".cp", function () {
+					g_hp = $(this).parent().children(".char-hp").val();
+					g_memo = $(this).parent().children(".char-memo").val();
+					$.toaster({priority: 'info', title: 'Notice', message: 'ユニット情報をコピーしました。'});
+				});
+				$(document).on("click", ".pst", function () {
+					$(this).parent().children(".char-hp").val(g_hp);
+					$(this).parent().children(".char-memo").val(g_memo);
+					$.toaster({priority: 'info', title: 'Notice', message: 'ユニット情報を貼り付けました。'});
+				});
+				$(document).on("click", ".cut", function () {
+					g_hp = $(this).parent().children(".char-hp").val();
+					g_memo = $(this).parent().children(".char-memo").val();
+					$(this).parent().children(".char-hp").val("0");
+					$(this).parent().children(".char-memo").val("");
+					$.toaster({priority: 'info', title: 'Notice', message: 'ユニット情報を切り取りました。'});
+				});
+				$(document).on("click", ".rm", function () {
+					$(this).parent().children(".char-hp").val("0");
+					$(this).parent().children(".char-memo").val("");
+					$.toaster({priority: 'info', title: 'Notice', message: 'ユニット情報を削除しました。'});
+				});
+
+				$(document).on("click", "#create-dat", function () {
+					var val = $("#1-1").children(".char-hp").val() + ',' + $("#1-2").children(".char-hp").val() + ',' + $("#1-3").children(".char-hp").val() + ',';
+					val += $("#2-1").children(".char-hp").val() + ',' + $("#2-2").children(".char-hp").val() + ',' + $("#2-3").children(".char-hp").val() + ',';
+					val += $("#3-1").children(".char-hp").val() + ',' + $("#3-2").children(".char-hp").val() + ',' + $("#3-3").children(".char-hp").val() + ',';
+					val += $("#4-1").children(".char-hp").val() + ',' + $("#4-2").children(".char-hp").val() + ',' + $("#4-3").children(".char-hp").val() + ',';
+					val += $("#5-1").children(".char-hp").val() + ',' + $("#5-2").children(".char-hp").val() + ',' + $("#5-3").children(".char-hp").val() + ',';
+					val += $("#1-1").children(".char-memo").val() + ',' + $("#1-2").children(".char-memo").val() + ',' + $("#1-3").children(".char-memo").val() + ',';
+					val += $("#2-1").children(".char-memo").val() + ',' + $("#2-2").children(".char-memo").val() + ',' + $("#2-3").children(".char-memo").val() + ',';
+					val += $("#3-1").children(".char-memo").val() + ',' + $("#3-2").children(".char-memo").val() + ',' + $("#3-3").children(".char-memo").val() + ',';
+					val += $("#4-1").children(".char-memo").val() + ',' + $("#4-2").children(".char-memo").val() + ',' + $("#4-3").children(".char-memo").val() + ',';
+					val += $("#5-1").children(".char-memo").val() + ',' + $("#5-2").children(".char-memo").val() + ',' + $("#5-3").children(".char-memo").val();
+					$("#export-dat").val(val);
+					$.toaster({priority: 'info', title: 'Notice', message: 'エクスポート完了'});
+				});
+				$(document).on("click", "#import-start", function () {
+					var val = $("#import-dat").val();
+					var term = val.split(',');
+					$("#1-1").children(".char-hp").val(Number(term[0]));
+					$("#1-2").children(".char-hp").val(Number(term[1]));
+					$("#1-3").children(".char-hp").val(Number(term[2]));
+					$("#2-1").children(".char-hp").val(Number(term[3]));
+					$("#2-2").children(".char-hp").val(Number(term[4]));
+					$("#2-3").children(".char-hp").val(Number(term[5]));
+					$("#3-1").children(".char-hp").val(Number(term[6]));
+					$("#3-2").children(".char-hp").val(Number(term[7]));
+					$("#3-3").children(".char-hp").val(Number(term[8]));
+					$("#4-1").children(".char-hp").val(Number(term[9]));
+					$("#4-2").children(".char-hp").val(Number(term[10]));
+					$("#4-3").children(".char-hp").val(Number(term[11]));
+					$("#5-1").children(".char-hp").val(Number(term[12]));
+					$("#5-2").children(".char-hp").val(Number(term[13]));
+					$("#5-3").children(".char-hp").val(Number(term[14]));
+					$("#1-1").children(".char-memo").val(term[15]);
+					$("#1-2").children(".char-memo").val(term[16]);
+					$("#1-3").children(".char-memo").val(term[17]);
+					$("#2-1").children(".char-memo").val(term[18]);
+					$("#2-2").children(".char-memo").val(term[19]);
+					$("#2-3").children(".char-memo").val(term[20]);
+					$("#3-1").children(".char-memo").val(term[21]);
+					$("#3-2").children(".char-memo").val(term[22]);
+					$("#3-3").children(".char-memo").val(term[23]);
+					$("#4-1").children(".char-memo").val(term[24]);
+					$("#4-2").children(".char-memo").val(term[25]);
+					$("#4-3").children(".char-memo").val(term[26]);
+					$("#5-1").children(".char-memo").val(term[27]);
+					$("#5-2").children(".char-memo").val(term[28]);
+					$("#5-3").children(".char-memo").val(term[29]);
+					$.toaster({priority: 'info', title: 'Notice', message: 'インポート完了'});
+				});
+				$(document).on("click", "#sample-dat", function () {
+					$("#import-dat").val("18800,4300,4400,18800,4300,4300,18800,4300,4300,21550,20550,20550,18800,18050,17620,体育祭フィン+2,イヌガミ無覚醒Lv1,アメジスト無覚醒Lv1,体育祭フィン+2,イヌガミ無覚醒Lv1,イヌガミ無覚醒Lv1,体育祭フィン+2,イヌガミ無覚醒Lv1,イヌガミ無覚醒Lv1,エリス+2,ベヒモス+2,ベヒモス+2,体育祭フィン+2,小正月アーサー+2,フレイア+2");
+					$.toaster({priority: 'info', title: 'Notice', message: 'サンプルデータセット'});
+				});
+				$(document).on("click", "#dat-export", function () {
+					$("#export-dat").val("");
+					return false;
+				});
+				$(document).on("click", "#dat-import", function () {
+					$("#import-dat").val("");
+					return false;
+				});
+
+				$(document).on("click", "#skill_check_exe", function () {
+					var s1_per = $("#skill_1_per").children(':selected').val();
+					var s1_cnt = $("#skill_1_count").children(':selected').val();
+					var s2_per = $("#skill_2_per").children(':selected').val();
+					var s2_cnt = $("#skill_2_count").children(':selected').val();
+					var s3_per = $("#skill_3_per").children(':selected').val();
+					var s3_cnt = $("#skill_3_count").children(':selected').val();
+					var s4_per = $("#skill_4_per").children(':selected').val();
+					var s4_cnt = $("#skill_4_count").children(':selected').val();
+					var s5_per = $("#skill_5_per").children(':selected').val();
+					var s5_cnt = $("#skill_5_count").children(':selected').val();
+					var s6_per = $("#skill_6_per").children(':selected').val();
+					var s6_cnt = $("#skill_6_count").children(':selected').val();
+					var s1_v = Math.pow(1 - (s1_per / 100), s1_cnt);
+					var s2_v = Math.pow(1 - (s2_per / 100), s2_cnt);
+					var s3_v = Math.pow(1 - (s3_per / 100), s3_cnt);
+					var s4_v = Math.pow(1 - (s4_per / 100), s4_cnt);
+					var s5_v = Math.pow(1 - (s5_per / 100), s5_cnt);
+                                        var s6_v = Math.pow(1 - (s6_per / 100), s6_cnt);
+					var s_v = s1_v * s2_v * s3_v * s4_v * s5_v* s6_v;
+					$("#skill_check_res span").html(Math.floor((1 - s_v) * 100) + '%');
+					return false;
+				});
+
+				$(document).on("click", ".opener", function () {
+					$($(this).data("target")).slideToggle();
+					return false;
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<div class="modal fade modal-export" tabindex="-1" role="dialog">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title" id="myModalLabel">デッキデータエクスポート</h4>
+					</div>
+					<div class="modal-body">
+						<input type="text" id="export-dat" value="">
+					</div>
+					<div class="modal-footer">
+						<button type="button" id="create-dat" class="btn btn-primary">データ生成</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade modal-import" tabindex="-1" role="dialog">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title" id="myModalLabel">デッキデータインポート</h4>
+					</div>
+					<div class="modal-body">
+						<p>エクスポートしたデータを貼り付けてインポート開始ボタンを押下して下さい。</p>
+						<input type="text" id="import-dat" value="">
+					</div>
+					<div class="modal-footer">
+						<button type="button" id="sample-dat" class="btn btn-primary">サンプルデータ</button>
+						<button type="button" id="import-start" class="btn btn-primary">インポート開始</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+				<h2><p style="text-align: center;">防衛デッキHP調整@刻のイシュタリア</p></h2><br>
+		<h4><p style="text-align: center;">更新履歴　2016/12/13　被タゲ時の残ユニットの表示バグを修正しました。</p></h4>
+		
+		<div class="container">
+			<div class="row">
+				<h3 class="opener" data-target="#note"><i class="fa fa-angle-right" aria-hidden="true"></i>使い方</h3>
+			</div>
+		</div>
+		<section class="container default-hide-content" id="note">
+			<div class="row">
+				<div class="col-md-12" style="padding: 0 5px;">
+					<ul style="margin: 0;padding-left: 20px;list-style: decimal;">
+						<li>第1～5部隊セットに各ユニットのHPを入力します。並び順はデッキの並び順と同じ並びで入力します。<br>デッキデータをクリアする場合は、「デッキデータリセット」ボタンを押下します。</li>
+						<li>ユニットHPの入力が完了したら、「デッキデータ算出」ボタンを押下します。これでデッキHPの割合算出が行われます。</li>
+						<li>召喚・砲撃ボタンで各パターンのユニット生存状態を確認します。</li>
+						<li>全体のHPと召喚、砲撃を受けた時のユニット生存状態を調整しつつ防衛デッキを整えていきます。<br>デッキ情報はセーブ・ロードできますので色々試しながら調整してみてください。</li>
+						<li>メモエリアに半角コンマ(,)を利用すると正しくデータセーブができない場合があります。不具合ではありません、仕様です。</li>
+						<li>各アイコンは、<i class="fa fa-files-o"></i>(ユニット情報のコピー)、<i class="fa fa-scissors"></i>(ユニット情報の切り取り)、<i class="fa fa-clipboard"></i>(ユニット情報の貼り付け)、<i class="fa fa-eraser"></i>(ユニット情報の削除)、になります。</li>
+					</ul>
+				</div>
+			</div>
+		</section>
+
+		<div class="container">
+			<div class="row">
+				<h3 class="opener" data-target="#hp_tool"><i class="fa fa-angle-right" aria-hidden="true"></i>防衛デッキセット・算出</h3>
+			</div>
+		</div>
+		<section class="container default-hide-content" id="hp_tool">
+			<div class="row">
+				<div class="col-md-4">
+					<h4>デッキメモ</h4>
+					<input type="text" id="deck-memo" class="deck-memo" value="" placeholder="例：平原用デッキ">
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-4">
+					<h4>第1部隊セット</h4>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-4 char-grid" id="1-1" data-toggle="modal" data-target="#unit-set" data-type="" data-hp="0">1ユニットHP<br><input type="number" class="char-hp" value="0"><br><input type="text" class="char-memo" placeholder="メモ"><i class="fa fa-files-o cp"></i><i class="fa fa-clipboard pst"></i><i class="fa fa-scissors cut"></i><i class="fa fa-eraser rm"></i></div>
+				<div class="col-md-4 char-grid" id="1-2" data-toggle="modal" data-target="#unit-set" data-type="" data-hp="0">2ユニットHP<br><input type="number" class="char-hp" value="0"><br><input type="text" class="char-memo" placeholder="メモ"><i class="fa fa-files-o cp"></i><i class="fa fa-clipboard pst"></i><i class="fa fa-scissors cut"></i><i class="fa fa-eraser rm"></i></div>
+				<div class="col-md-4 char-grid" id="1-3" data-toggle="modal" data-target="#unit-set" data-type="" data-hp="0">3ユニットHP<br><input type="number" class="char-hp" value="0"><br><input type="text" class="char-memo" placeholder="メモ"><i class="fa fa-files-o cp"></i><i class="fa fa-clipboard pst"></i><i class="fa fa-scissors cut"></i><i class="fa fa-eraser rm"></i></div>
+			</div>
+			<div class="row">
+				<div class="col-md-4">
+					<h3>第2部隊セット</h3>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-4 char-grid" id="2-1" data-toggle="modal" data-target="#unit-set" data-type="" data-hp="0">1ユニットHP<br><input type="number" class="char-hp" value="0"><br><input type="text" class="char-memo" placeholder="メモ"><i class="fa fa-files-o cp"></i><i class="fa fa-clipboard pst"></i><i class="fa fa-scissors cut"></i><i class="fa fa-eraser rm"></i></div>
+				<div class="col-md-4 char-grid" id="2-2" data-toggle="modal" data-target="#unit-set" data-type="" data-hp="0">2ユニットHP<br><input type="number" class="char-hp" value="0"><br><input type="text" class="char-memo" placeholder="メモ"><i class="fa fa-files-o cp"></i><i class="fa fa-clipboard pst"></i><i class="fa fa-scissors cut"></i><i class="fa fa-eraser rm"></i></div>
+				<div class="col-md-4 char-grid" id="2-3" data-toggle="modal" data-target="#unit-set" data-type="" data-hp="0">3ユニットHP<br><input type="number" class="char-hp" value="0"><br><input type="text" class="char-memo" placeholder="メモ"><i class="fa fa-files-o cp"></i><i class="fa fa-clipboard pst"></i><i class="fa fa-scissors cut"></i><i class="fa fa-eraser rm"></i></div>
+			</div>
+			<div class="row">
+				<div class="col-md-4">
+					<h3>第3部隊セット</h3>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-4 char-grid" id="3-1" data-toggle="modal" data-target="#unit-set" data-type="" data-hp="0">1ユニットHP<br><input type="number" class="char-hp" value="0"><br><input type="text" class="char-memo" placeholder="メモ"><i class="fa fa-files-o cp"></i><i class="fa fa-clipboard pst"></i><i class="fa fa-scissors cut"></i><i class="fa fa-eraser rm"></i></div>
+				<div class="col-md-4 char-grid" id="3-2" data-toggle="modal" data-target="#unit-set" data-type="" data-hp="0">2ユニットHP<br><input type="number" class="char-hp" value="0"><br><input type="text" class="char-memo" placeholder="メモ"><i class="fa fa-files-o cp"></i><i class="fa fa-clipboard pst"></i><i class="fa fa-scissors cut"></i><i class="fa fa-eraser rm"></i></div>
+				<div class="col-md-4 char-grid" id="3-3" data-toggle="modal" data-target="#unit-set" data-type="" data-hp="0">3ユニットHP<br><input type="number" class="char-hp" value="0"><br><input type="text" class="char-memo" placeholder="メモ"><i class="fa fa-files-o cp"></i><i class="fa fa-clipboard pst"></i><i class="fa fa-scissors cut"></i><i class="fa fa-eraser rm"></i></div>
+			</div>
+			<div class="row">
+				<div class="col-md-4">
+					<h3>第4部隊セット</h3>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-4 char-grid" id="4-1" data-toggle="modal" data-target="#unit-set" data-type="" data-hp="0">1ユニットHP<br><input type="number" class="char-hp" value="0"><br><input type="text" class="char-memo" placeholder="メモ"><i class="fa fa-files-o cp"></i><i class="fa fa-clipboard pst"></i><i class="fa fa-scissors cut"></i><i class="fa fa-eraser rm"></i></div>
+				<div class="col-md-4 char-grid" id="4-2" data-toggle="modal" data-target="#unit-set" data-type="" data-hp="0">2ユニットHP<br><input type="number" class="char-hp" value="0"><br><input type="text" class="char-memo" placeholder="メモ"><i class="fa fa-files-o cp"></i><i class="fa fa-clipboard pst"></i><i class="fa fa-scissors cut"></i><i class="fa fa-eraser rm"></i></div>
+				<div class="col-md-4 char-grid" id="4-3" data-toggle="modal" data-target="#unit-set" data-type="" data-hp="0">3ユニットHP<br><input type="number" class="char-hp" value="0"><br><input type="text" class="char-memo" placeholder="メモ"><i class="fa fa-files-o cp"></i><i class="fa fa-clipboard pst"></i><i class="fa fa-scissors cut"></i><i class="fa fa-eraser rm"></i></div>
+			</div>
+			<div class="row">
+				<div class="col-md-4">
+					<h3>第5部隊セット</h3>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-4 char-grid" id="5-1" data-toggle="modal" data-target="#unit-set" data-type="" data-hp="0">1ユニットHP<br><input type="number" class="char-hp" value="0"><br><input type="text" class="char-memo" placeholder="メモ"><i class="fa fa-files-o cp"></i><i class="fa fa-clipboard pst"></i><i class="fa fa-scissors cut"></i><i class="fa fa-eraser rm"></i></div>
+				<div class="col-md-4 char-grid" id="5-2" data-toggle="modal" data-target="#unit-set" data-type="" data-hp="0">2ユニットHP<br><input type="number" class="char-hp" value="0"><br><input type="text" class="char-memo" placeholder="メモ"><i class="fa fa-files-o cp"></i><i class="fa fa-clipboard pst"></i><i class="fa fa-scissors cut"></i><i class="fa fa-eraser rm"></i></div>
+				<div class="col-md-4 char-grid" id="5-3" data-toggle="modal" data-target="#unit-set" data-type="" data-hp="0">3ユニットHP<br><input type="number" class="char-hp" value="0"><br><input type="text" class="char-memo" placeholder="メモ"><i class="fa fa-files-o cp"></i><i class="fa fa-clipboard pst"></i><i class="fa fa-scissors cut"></i><i class="fa fa-eraser rm"></i></div>
+			</div>
+			<div class="row">
+				<div class="col-md-4">
+					<h3>デッキデータ算出</h3>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6" style="text-align: center;margin-bottom: 10px;"><a class="btn btn-primary btn-block" id="exec" href="#" role="button">デッキデータ算出</a></div>
+				<div class="col-md-6" style="text-align: center;margin-bottom: 10px;"><a class="btn btn-danger btn-block" id="grid-reset" href="#" role="button">デッキデータリセット</a></div>
+			</div>
+		</section>
+		<div class="container">
+			<div class="row">
+				<h3 class="opener" data-target="#data_save_load"><i class="fa fa-angle-right" aria-hidden="true"></i>防衛デッキセーブ・ロード</h3>
+			</div>
+		</div>
+		<section class="container default-hide-content" id="data_save_load">
+			<div class="row">
+				<div class="col-xs-6 col-sm-3" style="text-align: center;margin-bottom: 10px;"><a class="btn btn-primary btn-block" id="1-save" href="#" role="button">Deck1 Save</a></div>
+				<div class="col-xs-6 col-sm-3" style="text-align: center;margin-bottom: 10px;"><a class="btn btn-info btn-block" id="1-load" href="#" role="button">Deck1 Load</a></div>
+				<div class="col-xs-6 col-sm-3" style="text-align: center;margin-bottom: 10px;"><a class="btn btn-primary btn-block" id="2-save" href="#" role="button">Deck2 Save</a></div>
+				<div class="col-xs-6 col-sm-3" style="text-align: center;margin-bottom: 10px;"><a class="btn btn-info btn-block" id="2-load" href="#" role="button">Deck2 Load</a></div>
+				<div class="col-xs-6 col-sm-3" style="text-align: center;margin-bottom: 10px;"><a class="btn btn-primary btn-block" id="3-save" href="#" role="button">Deck3 Save</a></div>
+				<div class="col-xs-6 col-sm-3" style="text-align: center;margin-bottom: 10px;"><a class="btn btn-info btn-block" id="3-load" href="#" role="button">Deck3 Load</a></div>
+				<div class="col-xs-6 col-sm-3" style="text-align: center;margin-bottom: 10px;"><a class="btn btn-primary btn-block" id="4-save" href="#" role="button">Deck4 Save</a></div>
+				<div class="col-xs-6 col-sm-3" style="text-align: center;margin-bottom: 10px;"><a class="btn btn-info btn-block" id="4-load" href="#" role="button">Deck4 Load</a></div>
+				<div class="col-xs-6 col-sm-3" style="text-align: center;margin-bottom: 10px;"><a class="btn btn-primary btn-block" id="5-save" href="#" role="button">Deck5 Save</a></div>
+				<div class="col-xs-6 col-sm-3" style="text-align: center;margin-bottom: 10px;"><a class="btn btn-info btn-block" id="5-load" href="#" role="button">Deck5 Load</a></div>
+				<div class="col-xs-6 col-sm-3" style="text-align: center;margin-bottom: 10px;"><a class="btn btn-primary btn-block" id="6-save" href="#" role="button">Deck6 Save</a></div>
+				<div class="col-xs-6 col-sm-3" style="text-align: center;margin-bottom: 10px;"><a class="btn btn-info btn-block" id="6-load" href="#" role="button">Deck6 Load</a></div>
+				<div class="col-xs-6 col-sm-3" style="text-align: center;margin-bottom: 10px;"><a class="btn btn-primary btn-block" id="7-save" href="#" role="button">Deck7 Save</a></div>
+				<div class="col-xs-6 col-sm-3" style="text-align: center;margin-bottom: 10px;"><a class="btn btn-info btn-block" id="7-load" href="#" role="button">Deck7 Load</a></div>
+				<div class="col-xs-6 col-sm-3" style="text-align: center;margin-bottom: 10px;"><a class="btn btn-primary btn-block" id="8-save" href="#" role="button">Deck8 Save</a></div>
+				<div class="col-xs-6 col-sm-3" style="text-align: center;margin-bottom: 10px;"><a class="btn btn-info btn-block" id="8-load" href="#" role="button">Deck8 Load</a></div>
+				<div class="col-xs-6 col-sm-3" style="text-align: center;margin-bottom: 10px;"><a class="btn btn-primary btn-block" id="9-save" href="#" role="button">Deck9 Save</a></div>
+				<div class="col-xs-6 col-sm-3" style="text-align: center;margin-bottom: 10px;"><a class="btn btn-info btn-block" id="9-load" href="#" role="button">Deck9 Load</a></div>
+				<div class="col-xs-6 col-sm-3" style="text-align: center;margin-bottom: 10px;"><a class="btn btn-primary btn-block" id="10-save" href="#" role="button">Deck10 Save</a></div>
+				<div class="col-xs-6 col-sm-3" style="text-align: center;margin-bottom: 10px;"><a class="btn btn-info btn-block" id="10-load" href="#" role="button">Deck10 Load</a></div>
+				<div class="col-xs-12 col-md-6" style="text-align: center;margin-bottom: 10px;"><a class="btn btn-default btn-block" id="dat-export" href="#" role="button" data-toggle="modal" data-target=".modal-export">Deck Data Export</a></div>
+				<div class="col-xs-12 col-md-6" style="text-align: center;margin-bottom: 10px;"><a class="btn btn-default btn-block" id="dat-import" href="#" role="button" data-toggle="modal" data-target=".modal-import">Deck Data Import</a></div>
+			</div>
+		</section>
+		<div class="container">
+			<div class="row">
+				<h3 class="opener" data-target="#deck_data"><i class="fa fa-angle-right" aria-hidden="true"></i>防衛デッキ情報</h3>
+			</div>
+		</div>
+		<section class="container default-hide-content" id="deck_data">
+			<div class="row">
+				<div class="col-md-6" style="padding: 0 5px;">
+					<h3>デッキHP割合</h3>
+					<table class="table table-bordered table-hover">
+						<tr><th>1部隊[<span id="ps1">0</span>%]</th><td><span id="ps1-1" data-ps="0">0</span>%</td><td><span id="ps1-2" data-ps="0">0</span>%</td><td><span id="ps1-3" data-ps="0">0</span>%</td></tr>
+						<tr><th>2部隊[<span id="ps2">0</span>%]</th><td><span id="ps2-1" data-ps="0">0</span>%</td><td><span id="ps2-2" data-ps="0">0</span>%</td><td><span id="ps2-3" data-ps="0">0</span>%</td></tr>
+						<tr><th>3部隊[<span id="ps3">0</span>%]</th><td><span id="ps3-1" data-ps="0">0</span>%</td><td><span id="ps3-2" data-ps="0">0</span>%</td><td><span id="ps3-3" data-ps="0">0</span>%</td></tr>
+						<tr><th>4部隊[<span id="ps4">0</span>%]</th><td><span id="ps4-1" data-ps="0">0</span>%</td><td><span id="ps4-2" data-ps="0">0</span>%</td><td><span id="ps4-3" data-ps="0">0</span>%</td></tr>
+						<tr><th>5部隊[<span id="ps5">0</span>%]</th><td><span id="ps5-1" data-ps="0">0</span>%</td><td><span id="ps5-2" data-ps="0">0</span>%</td><td><span id="ps5-3" data-ps="0">0</span>%</td></tr>
+					</table>
+				</div>
+				<div class="col-md-6" style="padding: 0 5px;">
+					<h3>デッキ情報</h3>
+					<table class="table table-bordered table-hover">
+						<tr><td>総HP</td><td><span id="total-hp">0</span></td></tr>
+						<tr><td>このHPから出てくる</td><td><span id="now-hp">0</span></td></tr>
+                        <tr><td>このHPまで出てくる</td><td><span id="min-hp">0</span></td></tr>
+						<tr><td>自拠点陥没時与Pt</td><td><span id="give-point">0</span></td></tr>
+					</table>
+				</div>
+			</div>
+		</section>
+		<div class="container">
+			<div class="row">
+				<h3 class="opener" data-target="#deck_damage"><i class="fa fa-angle-right" aria-hidden="true"></i>防衛デッキ被ダメージ計算</h3>
+			</div>
+		</div>
+		<section class="container default-hide-content" id="deck_damage">
+			<div class="row">
+				<div class="col-md-6" style="padding: 0 5px;">
+					<h3 class="opener sub" data-target="#summon_list"><i class="fa fa-angle-right" aria-hidden="true"></i>被ダメージ</h3>
+					<div id="summon_list">
+						<a class="btn btn-default btn-block summon" href="#" role="button" data-ps="0.7">バハムート</a>
+						<a class="btn btn-default btn-block summon" href="#" role="button" data-ps="0.5">オルランド</a>
+						<a class="btn btn-default btn-block summon" href="#" role="button" data-ps="0.3">ローレライ（砲撃）</a>
+						<a class="btn btn-default btn-block summon" href="#" role="button" data-ps="0.2">タイタン</a>
+						<a class="btn btn-default btn-block summon" href="#" role="button" data-ps="0.15">ワルプルギス</a>
+						<a class="btn btn-default btn-block summon" href="#" role="button" data-ps="0.15">ウルスラグナ</a>
+					</div>
+					<h3 class="opener sub" data-target="#some_list"><i class="fa fa-angle-right" aria-hidden="true"></i>被タゲ→XXダメージ</h3>
+					<div class="default-hide-content" id="some_list">
+						<a class="btn btn-default btn-block target-summon" href="#" role="button" data-ps="0.7">タゲ→バハ</a>
+						<a class="btn btn-default btn-block target-summon" href="#" role="button" data-ps="0.5">タゲ→オル</a>
+						<a class="btn btn-default btn-block target-summon" href="#" role="button" data-ps="0.5,0.3">タゲ→オルロレ</a>
+						<a class="btn btn-default btn-block target-summon" href="#" role="button" data-ps="0.5,0.3">タゲ→オルロレロレ</a>
+						<a class="btn btn-default btn-block target-summon" href="#" role="button" data-ps="0.3">タゲ→ロレ</a>
+						<a class="btn btn-default btn-block target-summon" href="#" role="button" data-ps="0.3,0.3">タゲ→ロレロレ</a>
+						<a class="btn btn-default btn-block target-summon" href="#" role="button" data-ps="0.3,0.3,0.3">タゲ→ロレロレロレ</a>
+						<a class="btn btn-default btn-block target-summon" href="#" role="button" data-ps="0.3,0.3,0.3,0.3">タゲ→ロレロレロレロレ</a>
+						<p style="margin-top: 10px;">※砲撃はローレライと同ダメのためロレで確認してください。<br>※タゲ→XXはタゲ取った状態で与召喚ダメ→与部隊撃破ダメ後の状態を表示します。<br>※砲撃タゲ砲撃等のケースを確認したい場合は、ロレダメ与えてからタゲ→ロレで確認してください。<br>※通常召喚を押したらタゲ状態が自動的に解除されます。</p>
+					</div>
+				</div>
+				<div class="col-md-6" style="padding: 0 5px;">
+					<h3>ユニット生存</h3>
+					<table class="table table-bordered table-hover">
+						<tr><th></th><th>1ユニ</th><th>2ユニ</th><th>3ユニ</th></tr>
+						<tr><th>1部隊</th><td><span id="dm1-1" class="dm"></span></td><td><span id="dm1-2" class="dm"></span></td><td><span id="dm1-3" class="dm"></span></td></tr>
+						<tr><th>2部隊</th><td><span id="dm2-1" class="dm"></span></td><td><span id="dm2-2" class="dm"></span></td><td><span id="dm2-3" class="dm"></span></td></tr>
+						<tr><th>3部隊</th><td><span id="dm3-1" class="dm"></span></td><td><span id="dm3-2" class="dm"></span></td><td><span id="dm3-3" class="dm"></span></td></tr>
+						<tr><th>4部隊</th><td><span id="dm4-1" class="dm"></span></td><td><span id="dm4-2" class="dm"></span></td><td><span id="dm4-3" class="dm"></span></td></tr>
+						<tr><th>5部隊</th><td><span id="dm5-1" class="dm"></span></td><td><span id="dm5-2" class="dm"></span></td><td><span id="dm5-3" class="dm"></span></td></tr>
+					</table>
+				</div>
+			</div>
+		</section>
+
+		<div class="container">
+			<div class="row">
+				<h3 class="opener" data-target="#summon_data"><i class="fa fa-angle-right" aria-hidden="true"></i>征戦関連データ</h3>
+			</div>
+		</div>
+		<section class="container default-hide-content" id="summon_data">
+			<div class="row">
+				<div class="col-md-12" style="padding: 0 5px;">
+					<h3>召喚ダメージ、消費SP</h3>
+					<table class="table table-bordered table-hover">
+						<tr><th></th><th>ダメ</th><th>朝平原</th><th>平原</th><th>夜平原</th><th>機甲</th><th>砂漠</th><th>海上</th></tr>
+						<tr><th>バハムート</th><td>70%</td><td>100</td><td>100</td><td>100</td><td>100</td><td>100</td><td>--</td></tr>
+						<tr><th>リヴァイアサン</th><td>70%</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>80</td></tr>
+						<tr><th>オルランド</th><td>50%</td><td>--</td><td>50</td><td>50</td><td>50</td><td>50</td><td>50</td></tr>
+						<tr><th>ローレライ</th><td>30%</td><td>30</td><td>25</td><td>--</td><td>--</td><td>--</td><td>30</td></tr>
+						<tr><th>タイタン</th><td>20%</td><td>15</td><td>--</td><td>--</td><td>20</td><td>--</td><td>--</td></tr>
+						<tr><th>ワルプルギス</th><td>15%</td><td>--</td><td>--</td><td>15</td><td>--</td><td>--</td><td>--</td></tr>
+						<tr><th>ウルスラグナ</th><td>15%</td><td>--</td><td>--</td><td>--</td><td>--</td><td>30</td><td>--</td></tr>
+					</table>
+				</div>
+				<div class="col-md-12" style="padding: 0 5px;">
+					<h3>召喚SP効率</h3>
+					<p>1SP辺りのPt効率です。突撃と比較する場合はx5の値で比較してください。<br>小数点は四捨五入しています。<br>()内はx5（全拠点空城）した値です。</p>
+					<table class="table table-bordered table-hover">
+						<tr><th></th><th>朝平原</th><th>平原</th><th>夜平原</th><th>機甲</th><th>砂漠</th><th>海上</th></tr>
+						<tr><th>バハムート</th><td>50pt(250pt)</td><td>30pt(150pt)</td><td>21pt(107pt)</td><td>21pt(107pt)</td><td>50pt(250pt)</td><td>--</td></tr>
+						<tr><th>リヴァイアサン</th><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>さあね</td></tr>
+						<tr><th>オルランド</th><td>--</td><td>24pt(120pt)</td><td>17pt(86pt)</td><td>17pt(86pt)</td><td>40pt(200pt)</td><td>さあね</td></tr>
+						<tr><th>ローレライ</th><td>22pt(111pt)</td><td>16pt(80pt)</td><td>--</td><td>--</td><td>--</td><td>さあね</td></tr>
+						<tr><th>タイタン</th><td>44pt(222pt)</td><td>--</td><td>--</td><td>14pt(71pt)</td><td>--</td><td>--</td></tr>
+						<tr><th>ワルプルギス</th><td>--</td><td>--</td><td>19pt(95pt)</td><td>--</td><td>--</td><td>--</td></tr>
+						<tr><th>ウルスラグナ</th><td>--</td><td>--</td><td>--</td><td>--</td><td>22pt(111pt)</td><td>--</td></tr>
+						<tr><th>突撃</th><td>--(200pt)</td><td>--(200pt)</td><td>--(200pt)</td><td>--(200pt)</td><td>--(286pt)</td><td>--(200pt)</td></tr>
+					</table>
+				</div>
+				<div class="col-md-6" style="padding: 0 5px;">
+					<h3>召喚獣仕様</h3>
+					<table class="table table-bordered table-hover">
+						<tr><th>バハムート</th><td><ul style="list-style: decimal; margin: 0;padding-left: 20px;"><li>相手に現HPの70%ダメージを与える。</li><li>非戦闘中の拠点のフルHPの50%を回復する。</li><li>3分間味方の攻撃力を100%アップさせる。<br>※他の攻撃力アップバフがかかっている場合、効果・残り時間は上書きされる。</li></ul></td></tr>
+						<tr><th>リヴァイアサン</th><td><ul style="list-style: decimal; margin: 0;padding-left: 20px;"><li>相手に現HPの70%ダメージを与える。</li><li>3分間魔力充填及び充填待ち時間以外の消費SP及び待ち時間を半減（小数点以下切上）する。</li></ul></td></tr>
+						<tr><th>オルランド</th><td><ul style="list-style: decimal; margin: 0;padding-left: 20px;"><li>相手に現HPの50%ダメージを与える。</li><li>5分間味方の攻撃力を50%アップさせる。<br>※他の攻撃力アップバフがかかっている場合、効果・残り時間は上書きされる。</li></ul></td></tr>
+						<tr><th>ローレライ</th><td><ul style="list-style: decimal; margin: 0;padding-left: 20px;"><li>相手に現HPの30%（海上では50%）ダメージを与える。</li><li>非戦闘中の拠点のフルHPの50%を回復する。</li></ul></td></tr>
+						<tr><th>タイタン</th><td><ul style="list-style: decimal; margin: 0;padding-left: 20px;"><li>相手に現HPの20%ダメージを与える。</li><li>修復中拠点の残り時間を90秒短縮する。</li></ul></td></tr>
+						<tr><th>ワルプルギス</th><td><ul style="list-style: decimal; margin: 0;padding-left: 20px;"><li>相手に現HPの15%ダメージを与える。</li><li>非戦闘中の拠点のフルHPの50%を回復する。<br>※海上ステージでは25%回復</li><li>30秒間自陣の情報を隠蔽する。<br>隠蔽対象：征戦Pt、拠点残りHP、拠点修復状況、システムログ、メンバー情報</li></ul></td></tr>
+						<tr><th>ウルスラグナ</th><td><ul style="list-style: decimal; margin: 0;padding-left: 20px;"><li>相手に現HPの15%ダメージを与える。</li><li>30秒間、相手の攻撃・砲撃・突撃コマンドの消費SPを倍増させる。</li><li>30秒間、相手の召喚によるダメージ及び獲得Ptを半減させる。</li></ul></td></tr>
+					</table>
+				</div>
+				<div class="col-md-6" style="padding: 0 5px;">
+					<h3>征戦Pt</h3>
+					<table class="table table-bordered table-hover">
+						<tr><th></th><th>Pt</th></tr>
+						<tr><th>バハムート</th><td>3000pt/空き拠点</td></tr>
+						<tr><th>リヴァイアサン</th><td>3000pt/空き拠点</td></tr>
+						<tr><th>オルランド</th><td>1200pt/空き拠点</td></tr>
+						<tr><th>ローレライ</th><td>400pt/空き拠点</td></tr>
+						<tr><th>タイタン</th><td>400pt/空き拠点</td></tr>
+						<tr><th>ワルプルギス</th><td>400pt/空き拠点</td></tr>
+						<tr><th>ウルスラグナ</th><td>400pt/空き拠点</td></tr>
+						<tr><th>拠点撃破</th><td>3000pt + 撃破部隊HP/100pt</td></tr>
+						<tr><th>突撃</th><td>2000pt</td></tr>
+						<tr><th>砲撃</th><td>210pt</td></tr>
+						<tr><th>魔力充填</th><td>150pt</td></tr>
+						<tr><th>拠点修復</th><td>0pt</td></tr>
+					</table>
+				</div>
+			</div>
+		</section>
+
+		<div class="container">
+			<div class="row">
+				<h3 class="opener" data-target="#skill_checker"><i class="fa fa-angle-right" aria-hidden="true"></i>スキル出るかなチェッカー</h3>
+			</div>
+		</div>
+		<section class="container default-hide-content" id="skill_checker">
+			<div class="row">
+				<div class="col-md-12 skill-checker" style="padding: 0 5px;">
+					<p>スキルがどれくらいの確率で発動するかチェックできます、それだけです。<br>支援パッシブの調整やスキルニートのお慰みができます。<br>小数点切り捨て御免です。</p>
+					<p class="skill-checker-main">
+						<select id="skill_1_per"><option selected="selected">25</option><option>30</option><option>35</option><option>40</option><option>45</option></select>%を<select id="skill_1_count"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>積み<br>
+						<select id="skill_2_per"><option>25</option><option selected="selected">30</option><option>35</option><option>40</option><option>45</option></select>%を<select id="skill_2_count"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>積み<br>
+						<select id="skill_3_per"><option>25</option><option>30</option><option selected="selected">35</option><option>40</option><option>45</option></select>%を<select id="skill_3_count"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>積み<br>
+						<select id="skill_4_per"><option>25</option><option>30</option><option>35</option><option selected="selected">40</option><option>45</option></select>%を<select id="skill_4_count"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>積み<br>
+						<select id="skill_5_per"><option>25</option><option>30</option><option>35</option><option>40</option><option selected="selected">45</option></select>%を<select id="skill_5_count"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>積み<br>
+						<select id="skill_6_per"><option selected="selected">50</option></select>%を<select id="skill_6_count"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>積み<br>
+						<span id="skill_check_res">発動確率：<span></span></span>
+					</p>
+					<a class="btn btn-default" id="skill_check_exe">チェック</a>
+				</div>
+			</div>
+		</section>
+		<!-- writed by meme -->		
+<div class="container">
+			<div class="row">
+				<h3 class="opener" data-target="#attention"><i class="fa fa-angle-right" aria-hidden="true"></i>注意点・免責事項</h3>
+			</div>
+		</div>
+		<section class="container default-hide-content" id="attention">
+			<div class="row">
+				<div class="col-md-12" style="padding: 0 5px;">
+					<ul style="margin: 0;padding-left: 20px;list-style: decimal;">
+						<li>当ツールの作成者、及び現管理者、編集者は異なります。何かあれば刻のイシュタリア内の有栖までご一報ください。</li>
+						<li>当サイトはJavascript及びCookieを利用しています。Javascript及びCookieまたはその一部が利用できない場合、正常に利用できない場合があります。Cookieの有効期限は365日になります。</li>
+						<li>利用の結果生じた損害について、一切責任を負いません。</li>
+						<li>あなたの適用される法令に照らして、本サイトの利用が合法であることを保証しません。</li>
+						<li>コンテンツとして提供する全てのデータについて、内容の合法性・正確性等、あらゆる点において保証しません。</li>
+						<li>全てのデータにおいて、GNU Free Documentation Licenseに基づく改変・再利用を許諾しますが、法令その他の法慣習に反する形での利用を許諾するものではありません。</li>
+						<li>事前の予告無く、コンテンツの提供を中止する可能性があります。</li>
+					</ul>
+				</div>
+			</div>
+		</section>
+
+		<section class="container" id="attention" style="margin-top: 20px;">
+			<div class="row">
+				<div class="col-md-12" style="margin-top: 30px;">
+					
+当ツールは、諸事情により前作成者がメンテナンスできなくなった為、GNU Free Documentation Licenseに基づく改変・再利用の許可より<a href="https://twitter.com/Alice_ish" target="_blank">有栖おじさん</a>が勝手に引き継いだものです。
+サポートやご意見は前管理人様ではなく有栖おじさんまでお願い致します。また、ソースコードは<a href="https://github.com/Alice-ish/reconquista" target="_blank">こちら</a>よりご参照下さいませ。
+				</div>
+			</div>
+		</section>
+	</body>
+</html>
+
+
