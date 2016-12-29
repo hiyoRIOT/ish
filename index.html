@@ -233,9 +233,11 @@ and open the template in the editor.
 				        set_summon_dm(hp, 0);
 				        $("#target-onoff").html("なし");
 				        $("#target-text").html("ロック");
+				        $.toaster({ priority: 'danger', title: 'Notice', message: 'ターゲット解除しました。' });
 				    } else {
 				        $("#target-onoff").html("あり");
 				        $("#target-text").html("解除");
+				        $.toaster({ priority: 'danger', title: 'Notice', message: 'ターゲットロックしました。' });
 				    }
 				    return false;
 				});
